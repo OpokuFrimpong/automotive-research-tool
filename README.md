@@ -1,19 +1,19 @@
-# 🔍 AI-Powered Search Tool with LangChain
+#  AI-Powered Search Tool with LangChain
 
 An intelligent web search tool that searches the internet and provides AI-summarized answers. Built with LangChain, FastAPI, and supports both local (Ollama) and cloud (OpenAI) LLMs.
 
 Perfect for automotive industry research - BMW, Audi, Bosch, and more!
 
-## 🌟 Features
+## Features
 
-- ✅ **AI-Powered Search**: Searches web and generates intelligent summaries
-- ✅ **Dual LLM Support**: Choose between Ollama (free, local) or OpenAI (cloud)
-- ✅ **Beautiful Web UI**: Modern, responsive interface
-- ✅ **FastAPI Backend**: RESTful API with automatic documentation
-- ✅ **LangChain Integration**: Built on industry-standard AI framework
-- ✅ **Easy to Deploy**: Simple setup and deployment
+-  **AI-Powered Search**: Searches web and generates intelligent summaries
+-  **Dual LLM Support**: Choose between Ollama (free, local) or OpenAI (cloud)
+-  **Beautiful Web UI**: Modern, responsive interface
+-  **FastAPI Backend**: RESTful API with automatic documentation
+-  **LangChain Integration**: Built on industry-standard AI framework
+-  **Easy to Deploy**: Simple setup and deployment
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 LangChain/
@@ -29,7 +29,7 @@ LangChain/
 └── README.md
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -92,7 +92,7 @@ python api.py
 
 Open your browser: **http://localhost:8000**
 
-## 💬 Usage Examples
+## Usage Examples
 
 ### Web Interface
 
@@ -135,7 +135,7 @@ Response:
 }
 ```
 
-## 🛠️ Development
+##  Development
 
 ### Project Components
 
@@ -153,7 +153,7 @@ Analyze the search results and provide a clear, concise answer.
 Focus on BMW, Audi, and Bosch when relevant.""")
 ```
 
-## 📚 Tech Stack
+##  Tech Stack
 
 - **LangChain**: AI application framework
 - **FastAPI**: Modern Python web framework
@@ -161,18 +161,18 @@ Focus on BMW, Audi, and Bosch when relevant.""")
 - **DuckDuckGo**: Web search API
 - **Uvicorn**: ASGI server
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions welcome! Feel free to:
 - Report bugs
 - Suggest features
 - Submit pull requests
 
-## 📄 License
+##  License
 
 MIT License - feel free to use for personal or commercial projects!
 
-## 🔗 Resources
+##  Resources
 
 - [LangChain Documentation](https://python.langchain.com)
 - [FastAPI Documentation](https://fastapi.tiangolo.com)
@@ -180,5 +180,3 @@ MIT License - feel free to use for personal or commercial projects!
 - [OpenAI API](https://platform.openai.com)
 
 ---
-
-Built with ❤️ for the automotive industry
