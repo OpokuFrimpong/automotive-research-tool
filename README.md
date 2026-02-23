@@ -23,7 +23,6 @@ LangChain/
 ├── server/              # Backend
 │   ├── api.py          # FastAPI backend (main app)
 │   ├── chatbot.py      # CLI chatbot
-│   ├── discord_bot.py  # Discord integration
 │   └── search_tool.py  # Search tool CLI
 ├── .env.example        # Environment template
 ├── .gitignore
@@ -112,10 +111,6 @@ cd server
 python chatbot.py
 ```
 
-### Discord Bot
-
-See [DISCORD_BOT_README.md](DISCORD_BOT_README.md) for Discord integration.
-
 ## 🔧 API Documentation
 
 Once running, visit:
@@ -147,7 +142,6 @@ Response:
 - **client/**: Frontend HTML/CSS/JS
 - **server/api.py**: Main FastAPI application
 - **server/chatbot.py**: Standalone CLI chatbot
-- **server/discord_bot.py**: Discord bot integration
 - **server/search_tool.py**: Command-line search tool
 
 ### Customize for Your Industry
