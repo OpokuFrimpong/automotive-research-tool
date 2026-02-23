@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Search Tool - LangChain</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .llm-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .llm-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .llm-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .llm-option label {
+            cursor: pointer;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .examples {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .examples h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .example-tag {
+            display: inline-block;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 13px;
+            color: #667eea;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .example-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #667eea;
+        }
+
+        .result h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .result-content {
+            color: #555;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .error {
+            background: #fee;
+            border-left-color: #f44336;
+        }
+
+        .error h2 {
+            color: #f44336;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 AI Search Tool</h1>
+        <p class="subtitle">Powered by LangChain & FastAPI</p>
+
+        <div class="llm-selector">
+            <div class="llm-option">
+                <input type="radio" id="ollama" name="llm" value="ollama" checked>
+                <label for="ollama">🖥️ Ollama (Local)</label>
+            </div>
+            <div class="llm-option">
+                <input type="radio" id="openai" name="llm" value="openai">
+                <label for="openai">☁️ OpenAI (Cloud)</label>
+            </div>
+        </div>
+
+        <div class="examples">
+            <h3>💡 Try these examples (click to use):</h3>
+            <span class="example-tag" onclick="setQuestion('Latest BMW electric vehicles 2026')">Latest BMW electric vehicles 2026</span>
+            <span class="example-tag" onclick="setQuestion('Bosch automotive innovations')">Bosch automotive innovations</span>
+            <span class="example-tag" onclick="setQuestion('Audi Q5 technical specifications')">Audi Q5 technical specifications</span>
+            <span class="example-tag" onclick="setQuestion('Future of autonomous driving')">Future of autonomous driving</span>
+        </div>
+
+        <div class="search-box">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="question" 
+                    placeholder="Ask anything... (e.g., Latest BMW innovations)"
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button onclick="search()" id="searchBtn">Search</button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Searching and analyzing results...</p>
+        </div>
+
+        <div class="result" id="result">
+            <h2>📝 Answer</h2>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+
+        <div class="footer">
+            Built with <a href="https://python.langchain.com" target="_blank">LangChain</a> 
+            & <a href="https://fastapi.tiangolo.com" target="_blank">FastAPI</a>
+        </div>
+    </div>
+
+    <script>
+        function setQuestion(text) {
+            document.getElementById('question').value = text;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                search();
+            }
+        }
+
+        async function search() {
+            const question = document.getElementById('question').value.trim();
+            
+            if (!question) {
+                alert('Please enter a question!');
+                return;
+            }
+
+            if (question.length < 3) {
+                alert('Question too short! Please be more specific.');
+                return;
+            }
+
+            const useOllama = document.getElementById('ollama').checked;
+            const searchBtn = document.getElementById('searchBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+
+            // Show loading
+            searchBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        use_ollama: useOllama
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Search failed');
+                }
+
+                // Show result
+                result.classList.remove('error');
+                resultContent.textContent = data.answer;
+                result.style.display = 'block';
+
+            } catch (error) {
+                // Show error
+                result.classList.add('error');
+                resultContent.textContent = error.message;
+                result.style.display = 'block';
+            } finally {
+                // Hide loading
+                loading.style.display = 'none';
+                searchBtn.disabled = false;
+            }
+        }
+
+        // Focus on input on load
+        window.onload = () => {
+            document.getElementById('question').focus();
+        };
+    </script>
+</body>
+</html>
