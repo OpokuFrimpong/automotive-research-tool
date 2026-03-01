@@ -4,6 +4,7 @@ Powered by LangChain
 """
 
 import os
+import asyncio
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,10 +42,15 @@ class SearchResponse(BaseModel):
     answer: str
     error: Optional[str] = None
 
-# Initialize LangChain components
+# Cache chains to avoid re-initializing LLM on every request
+_chains = {}
+
 def get_chain(use_ollama: bool = True):
-    """Get LangChain search chain"""
-    
+    """Get LangChain search chain (cached)"""
+    key = "ollama" if use_ollama else "openai"
+    if key in _chains:
+        return _chains[key]
+
     # Initialize LLM
     if use_ollama:
         from langchain_ollama import ChatOllama
@@ -70,14 +76,15 @@ Search Results:
 Provide a comprehensive answer based on these results.""")
     ])
     
-    # Create chain
+    # Create chain and cache it
     chain = prompt | llm | StrOutputParser()
+    _chains[key] = chain
     return chain
 
-def run_search(query: str, max_results: int = 5) -> str:
+def run_search(query: str, max_results: int = 3) -> str:
     """Run a DuckDuckGo search and return formatted results"""
     try:
-        with DDGS() as ddgs:
+        with DDGS(timeout=10) as ddgs:
             results = list(ddgs.text(query, max_results=max_results))
         if not results:
             return ""
@@ -92,7 +99,9 @@ def run_search(query: str, max_results: int = 5) -> str:
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """Serve the frontend"""
-    with open("../client/static/index.html", "r", encoding="utf-8") as f:
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    html_path = os.path.join(base_dir, "client", "static", "index.html")
+    with open(html_path, "r", encoding="utf-8") as f:
         return f.read()
 
 @app.post("/api/search", response_model=SearchResponse)
@@ -104,9 +113,9 @@ async def search(request: SearchRequest):
         if not request.question or len(request.question.strip()) < 3:
             raise HTTPException(status_code=400, detail="Question too short")
         
-        # Search web with error handling
+        # Search web with error handling (run in thread to avoid blocking event loop)
         try:
-            search_results = run_search(request.question)
+            search_results = await asyncio.to_thread(run_search, request.question)
             print(f"DEBUG: Search results: {search_results[:500] if search_results else 'EMPTY'}")
         except Exception as search_error:
             # If search fails, return a helpful error message
@@ -132,8 +141,8 @@ async def search(request: SearchRequest):
         # Get LangChain chain
         chain = get_chain(use_ollama=request.use_ollama)
         
-        # Generate answer
-        answer = chain.invoke({
+        # Generate answer (run in thread to avoid blocking event loop)
+        answer = await asyncio.to_thread(chain.invoke, {
             "question": request.question,
             "search_results": search_results
         })

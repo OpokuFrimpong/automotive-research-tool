@@ -186,7 +186,28 @@
         .result-content {
             color: #555;
             line-height: 1.8;
-            white-space: pre-wrap;
+        }
+
+        .result-content h1, .result-content h2, .result-content h3 {
+            color: #333;
+            margin: 16px 0 8px;
+        }
+
+        .result-content p {
+            margin-bottom: 10px;
+        }
+
+        .result-content ul, .result-content ol {
+            padding-left: 24px;
+            margin-bottom: 10px;
+        }
+
+        .result-content li {
+            margin-bottom: 4px;
+        }
+
+        .result-content strong {
+            color: #333;
         }
 
         .error {
@@ -213,22 +234,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔍 AI Search Tool</h1>
+        <h1> AI Search Tool</h1>
         <p class="subtitle">Powered by LangChain & FastAPI</p>
 
         <div class="llm-selector">
             <div class="llm-option">
                 <input type="radio" id="ollama" name="llm" value="ollama" checked>
-                <label for="ollama">🖥️ Ollama (Local)</label>
+                <label for="ollama"> Ollama (Local)</label>
             </div>
             <div class="llm-option">
                 <input type="radio" id="openai" name="llm" value="openai">
-                <label for="openai">☁️ OpenAI (Cloud)</label>
+                <label for="openai"> OpenAI (Cloud)</label>
             </div>
         </div>
 
         <div class="examples">
-            <h3>💡 Try these examples (click to use):</h3>
+            <h3> Try these examples (click to use):</h3>
             <span class="example-tag" onclick="setQuestion('Latest BMW electric vehicles 2026')">Latest BMW electric vehicles 2026</span>
             <span class="example-tag" onclick="setQuestion('Bosch automotive innovations')">Bosch automotive innovations</span>
             <span class="example-tag" onclick="setQuestion('Audi Q5 technical specifications')">Audi Q5 technical specifications</span>
@@ -318,13 +339,13 @@
 
                 // Show result
                 result.classList.remove('error');
-                resultContent.textContent = data.answer;
+                resultContent.innerHTML = simpleMarkdown(data.answer);
                 result.style.display = 'block';
 
             } catch (error) {
                 // Show error
                 result.classList.add('error');
-                resultContent.textContent = error.message;
+                resultContent.textContent = error.message;  // keep errors as plain text
                 result.style.display = 'block';
             } finally {
                 // Hide loading
@@ -337,6 +358,28 @@
         window.onload = () => {
             document.getElementById('question').focus();
         };
+
+        function simpleMarkdown(text) {
+            return text
+                // Escape HTML
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                // Headers
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                // Bold
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Bullet points
+                .replace(/^\* (.+)$/gm, '<li>$1</li>')
+                .replace(/^- (.+)$/gm, '<li>$1</li>')
+                // Wrap consecutive <li> in <ul>
+                .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+                // Paragraphs (blank line separation)
+                .replace(/\n{2,}/g, '</p><p>')
+                .replace(/^(?!<[hul])(.+)$/gm, (m) => m.startsWith('<') ? m : m)
+                // Line breaks
+                .replace(/\n/g, '<br>');
+        }
     </script>
 </body>
 </html>

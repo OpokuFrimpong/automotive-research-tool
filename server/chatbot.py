@@ -29,7 +29,7 @@ def create_chatbot(use_ollama=True):
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise ValueError("OPENAI_API_KEY not found in .env file")
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.5)
         print("🤖 Using OpenAI GPT-3.5\n")
     
     # Create prompt template with memory
@@ -56,7 +56,7 @@ def create_chatbot(use_ollama=True):
 
 def main():
     print("=" * 60)
-    print("🚗 LangChain Chatbot")
+    print("LangChain Chatbot")
     print("=" * 60)
     
     # Choose your LLM provider
